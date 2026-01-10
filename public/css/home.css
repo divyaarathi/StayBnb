@@ -1,0 +1,405 @@
+/* ====== home-vibrant.css ====== */
+
+/* Reset & base */
+:root{
+  --accent1: #ff6b6b;
+  --accent2: #ffb86b;
+  --muted: #f7f7f9;
+  --card-shadow: 0 8px 30px rgba(15,15,30,0.08);
+  --glass: rgba(255,255,255,0.6);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg,#fff 0%, #fffdf9 100%);
+  color:#222;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.45;
+}
+
+/* ---------- NAVBAR ---------- */
+.site-header{position:sticky;top:0;z-index:60;background:linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.45));backdrop-filter: blur(6px);border-bottom:1px solid rgba(0,0,0,0.04)}
+.aura-nav{
+  max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0.7rem 20px;
+}
+
+/* left / right small zones */
+.nav-left,.nav-right{display:flex;align-items:center;gap:10px}
+
+/* brand centered */
+.nav-brand{
+  display:flex;align-items:center;gap:10px;text-decoration:none;color:#222;font-weight:800;font-size:1.15rem;
+  padding:6px 12px;border-radius:12px;
+  transition: transform .18s ease, box-shadow .18s ease;
+  box-shadow: 0 6px 18px rgba(255,107,107,0.08);
+  background: linear-gradient(120deg, rgba(255,255,255,0.8), rgba(255,255,255,0.6));
+}
+.nav-brand:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(255,107,107,0.12)}
+.brand-icon{color:var(--accent1);font-size:1.35rem}
+
+/* hamburger */
+.nav-hamburger{background:transparent;border:none;font-size:1.15rem;padding:8px;border-radius:8px;cursor:pointer;color:#333}
+.nav-hamburger:hover{background:rgba(0,0,0,0.03)}
+
+/* right CTAs */
+.nav-cta{
+  text-decoration:none;color:#222;padding:8px 12px;border-radius:10px;transition:all .18s;
+  font-weight:600;font-size:0.95rem;background:transparent;
+}
+.nav-cta.host{background:linear-gradient(90deg,var(--accent1), var(--accent2));color:white;box-shadow: 0 8px 24px rgba(255,107,107,0.12)}
+.nav-cta:hover{transform:translateY(-3px)}
+
+/* ---------- HERO (parallax feel) ---------- */
+.hero{
+  min-height:78vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:visible;
+  /* using the uploaded image path as hero background (dev will turn local path into served url) */
+  background-image: url("/mnt/data/Screenshot 2025-11-20 103609.png"), linear-gradient(135deg,#ffd5d5, #ffe8c6);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.hero::after{
+  content:"";
+  position:absolute;inset:0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.08) 100%);
+  pointer-events:none;
+}
+
+.hero-inner{
+  position:relative;z-index:4;max-width:1100px;padding:40px 20px;text-align:center;color:white;
+  transform:translateY(-10px);
+}
+
+.hero-title{font-size:clamp(2rem, 4.5vw, 3.6rem);line-height:1.02;margin-bottom:12px;font-weight:800;text-shadow:0 8px 30px rgba(0,0,0,0.35)}
+.hero-sub{font-size:1.05rem;opacity:0.95;margin-bottom:18px}
+
+/* hero actions */
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary, .btn-ghost, .btn-cta {
+  padding:12px 20px;border-radius:999px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:10px;
+}
+.btn-primary{
+  background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:white;box-shadow:0 12px 30px rgba(255,107,107,0.14);
+  transform:translateZ(0);
+}
+.btn-primary:hover{transform:translateY(-4px)}
+.btn-ghost{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.12);color:white}
+.btn-ghost:hover{background:rgba(255,255,255,0.18)}
+
+/* ---------- ABOUT / FEATURES ---------- */
+.about{padding:60px 6% 40px}
+.about-grid{display:grid;grid-template-columns:1fr 420px;gap:32px;align-items:start;max-width:1200px;margin:0 auto}
+.about h2{font-size:1.9rem;margin-bottom:10px}
+.about .lead{color:#444;margin-bottom:18px;font-size:1.05rem}
+.btn-outline{display:inline-block;padding:10px 16px;border-radius:12px;border:1px solid rgba(0,0,0,0.06);background:white;font-weight:700}
+
+/* feature cards */
+.about-cards{display:flex;flex-direction:column;gap:16px}
+.feature-card{background:linear-gradient(180deg,#fff,#fff);padding:18px;border-radius:14px;box-shadow:var(--card-shadow);position:relative}
+.chip{position:absolute;right:14px;top:14px;background:var(--muted);padding:4px 8px;border-radius:8px;font-weight:700;color:#555}
+
+/* ---------- DESTINATIONS — Masonry / Pinterest ---------- */
+.destinations{padding:40px 6%}
+.section-title{text-align:center;font-size:1.6rem;margin-bottom:18px;font-weight:800}
+
+/* MASONRY using CSS columns */
+.masonry{
+  column-count: 4;
+  column-gap: 18px;
+  max-width:1200px;margin:0 auto;
+}
+.pin{
+  display:inline-block;
+  width:100%;
+  margin:0 0 18px;
+  border-radius:12px;
+  overflow:hidden;
+  background:white;
+  box-shadow:0 10px 30px rgba(15,15,30,0.06);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.pin img{width:100%;display:block;object-fit:cover}
+.pin-meta{padding:12px 14px}
+.pin-meta h3{font-size:1.05rem;margin-bottom:6px}
+.pin-meta p{font-size:0.92rem;color:#666}
+
+/* hover */
+.pin:hover{transform:translateY(-8px);box-shadow:0 20px 48px rgba(15,15,30,0.12)}
+
+/* responsive columns */
+@media (max-width:1100px){ .masonry{column-count:3} }
+@media (max-width:820px){ .masonry{column-count:2} .about-grid{grid-template-columns:1fr} .hero{background-attachment: scroll} .nav-right{display:none} }
+@media (max-width:520px){ .masonry{column-count:1} .nav-hamburger{display:block} .nav-brand{font-size:1rem} }
+
+/* ---------- FINAL CTA ---------- */
+.final-cta{padding:60px 6%;text-align:center;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white}
+.final-cta h2{font-size:1.8rem;margin-bottom:14px}
+.btn-cta{background:white;color:var(--accent1);padding:12px 22px;border-radius:999px;font-weight:800}
+
+/* ---------- FOOTER ---------- */
+.site-footer{padding:22px;text-align:center;color:#666;background:transparent;border-top:1px solid rgba(0,0,0,0.03);margin-top:20px}
+/* ======================= */
+/* ANIMATION BASE CLASSES  */
+/* ======================= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+  transition: all 0.8s ease-out;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ======================= */
+/* PINTEREST STYLE GRID    */
+/* ======================= */
+
+.pinterest-section {
+  padding: 5rem 2rem;
+  background: #faf7f3;
+}
+
+.pinterest-grid {
+  column-count: 3;
+  column-gap: 2rem;
+}
+
+.p-card {
+  break-inside: avoid;
+  background: white;
+  margin-bottom: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.p-card:hover {
+  transform: translateY(-5px) scale(1.02);
+}
+
+.p-card img {
+  width: 100%;
+  border-bottom: 1px solid #eee;
+}
+
+.p-card .info {
+  padding: 1.2rem;
+}
+
+.p-card h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.p-card p {
+  margin: 8px 0 0;
+  color: #777;
+  font-size: 0.95rem;
+}
+
+/* For tablet */
+@media (max-width: 900px) {
+  .pinterest-grid {
+    column-count: 2;
+  }
+}
+
+/* For mobile */
+@media (max-width: 600px) {
+  .pinterest-grid {
+    column-count: 1;
+  }
+}
+.p-card img {
+              width: 100%;
+              height: 40px; /* adjust height as you like */
+              /*object-fit: cover; /* ensures perfect cropping */
+              display: block;
+              border-bottom: 1px solid #eee;
+              border-radius: 12px 12px 0 0; /* smooth top corners */
+            }
+       .reveal {
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+  transition: all 0.7s ease-out;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.hero {
+  height: 90vh;
+  background-image: url("https://images.unsplash.com/photo-1510568668902-c879acf576b9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* PARALLAX EFFECT */
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  padding: 0 20px;
+}
+
+/* Smooth dark overlay */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(1px);
+  z-index: 1;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  color: white;
+}
+
+/* Title styling */
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* Subtitle */
+.hero-sub {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.95;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-ghost {
+  padding: 0.9rem 1.8rem;
+  font-size: 1rem;
+  border-radius: 40px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.25s ease;
+}
+
+.btn-primary {
+  background: #ff385c;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #e03152;
+}
+
+.btn-ghost {
+  border: 2px solid #fff;
+  color: white;
+  margin-left: 1rem;
+}
+
+.btn-ghost:hover {
+  background: white;
+  color: black;
+}
+/* ===== DESTINATIONS SECTION WITH BACKGROUND IMAGE ===== */
+.destinations {
+  padding: 3rem 2rem;
+  background-image: url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1920&auto=format&fit=crop");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* parallax-like */
+  position: relative;
+}
+
+/* Dark overlay for readability */
+.destinations::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1;
+}
+
+.destinations > * {
+  position: relative;
+  z-index: 2; /* ensures text & cards appear above overlay */
+}
+.masonry {
+  column-count: 3;
+  column-gap: 1.5rem;
+}
+
+.pin {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pin:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+.destinations-title {
+    color: white;                  /* White text */
+    font-weight: bold;             /* Bold text */
+    text-align: center;            /* Centered */
+    font-size: 3rem;               /* Larger font */
+    margin: 40px 0 30px; /* top 40px, bottom 30px */                /* Top and bottom spacing */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);  /* Adds depth for visibility */
+    line-height: 1.2;              /* Slightly tighter line spacing */
+    letter-spacing: 1px;           /* Optional: adds a little space between letters */
+}
+
+.masonry {
+    column-count: 3;
+    column-gap: 1.5rem;
+    margin-top: 20px; /* adds extra space below the title */
+}
+.pin-meta {
+  padding: 12px 14px; /* already in your CSS */
+  /* add a little extra space on top */
+  margin-top: 8px; 
+}
+
+.pin-meta h3 {
+  margin-top: 12px;   /* space between image and heading */
+  margin-bottom: 6px; /* space between heading and paragraph */
+  font-size: 1.05rem;
+}
+
+.pin-meta p {
+  margin: 0;  /* optional: keep paragraph tight */
+  font-size: 0.92rem;
+  color: #666;
+}
+.hero-sub {
+    font-size: 1.25rem;          /* slightly larger */
+    color: rgba(255, 255, 255, 0.9); /* bright but soft on hero background */
+    font-weight: 500;             /* medium weight for elegance */
+    text-align: center;
+    letter-spacing: 0.5px;       /* adds subtle spacing between letters */
+    line-height: 1.5;             /* more breathing space */
+    margin-bottom: 2rem;         /* spacing from buttons/cards below */
+}

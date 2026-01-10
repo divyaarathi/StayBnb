@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>StayBnb — Explore</title>
+
+    <!-- Replace or keep as-is; your server serves /css/.. from public -->
+    <link rel="stylesheet" href="/css/home.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+
+  <body>
+    <!-- ===== NAVBAR (brand-new aesthetic) ===== -->
+    <header class="site-header">
+      <nav class="aura-nav">
+        <div class="nav-left">
+          <button class="nav-hamburger" aria-label="menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+
+        <a class="nav-brand" href="/">
+          <i class="fa-solid fa-compass brand-icon"></i>
+          <span class="brand-text">StayBnb</span>
+        </a>
+
+        <div class="nav-right">
+          <a class="nav-cta host" href="/listings/new">Become a host</a>
+          <a class="nav-cta" href="/signup">Sign up</a>
+          <a class="nav-cta" href="/login">Log in</a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ===== HERO (parallax + overlay) ===== -->
+    <section class="hero">
+      <div class="hero-inner">
+        <h1 class="hero-title">Find stays that feel like home</h1>
+        <p class="hero-sub">
+          Handpicked Homes • Vibrant Places • Unique Experiences
+
+        </p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="/listings">Explore Listings</a>
+          <a class="btn-ghost" href="#destinations">Popular picks</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ABOUT + FEATURES ===== -->
+    <section class="about">
+      <div class="about-grid">
+        <div class="about-left">
+          <h2>Welcome to <span class="accent">StayBnb</span></h2>
+          <p class="lead">
+            A visual playground for travelers — discover curated spaces,
+            trending stays and tiny gems across the world. Designed like a
+            board, inspired by discovery.A visual playground for travelers —
+            where exploration begins long before the journey starts. Dive into a
+            world of handpicked stays, breathtaking escapes, and beautifully
+            designed homes that spark curiosity. Here, you’ll discover cozy
+            cabins hidden among the mountains, stylish city lofts buzzing with
+            culture, serene beach villas washed in sunlight, and unique tiny
+            homes that feel like stories carved into nature. Every space is
+            curated with intention — a blend of comfort, character, and
+            inspiration — so you can imagine your next trip the moment you see
+            it. StayBnb isn’t just a place to browse; it’s a board of dreams, a
+            gallery of destinations, and a world of possibilities waiting for
+            you. Scroll, explore, design your journey — one beautiful stay at a
+            time.
+          </p>
+          <a class="btn-outline" href="/listings">Browse all stays</a>
+        </div>
+
+        <div class="about-cards">
+          <div class="feature-card">
+            <div class="chip">Verified</div>
+            <h3>Trusted Hosts</h3>
+            <p>
+              Profiles verified by our community — clean stays, safe bookings.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="chip">Flexible</div>
+            <h3>Flexible Cancellation</h3>
+            <p>Change of plans? We have many flexible booking options.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="chip">Local</div>
+            <h3>Local Experiences</h3>
+            <p>Handpicked local stays with host recommendations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DESTINATIONS — pinterest-like masonry ===== -->
+   <section id="destinations" class="destinations">
+    <h1 class="destinations-title">
+        StayBnb WanderWall — Explore Beautiful Corners Worldwide
+    </h1>
+    <h2 class="section-title"></h2>
+</section>
+
+
+      <!-- masonry grid using CSS columns for Pinterest effect -->
+      <div class="masonry">
+        <!-- Sample cards (replace sources or generate dynamically from your listings) -->
+        <article class="pin">
+          <img
+            src="https://images.unsplash.com/photo-1496566084516-c5b96fcbd5c8?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Beach bungalow"
+          />
+       
+          <div class="pin-meta">
+            <h3>Goa — Beachside bungalow</h3>
+            <p>From ₹2,500 / night</p>
+          </div>
+        </article>
+
+        <article class="pin">
+          <img
+            src="https://images.unsplash.com/photo-1482192505345-5655af888cc4?q=80&w=1228&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Mountain cabin"
+          />
+
+          <div class="pin-meta">
+            <h3>Manali — Mountain cabin</h3>
+            <p>From ₹3,300 / night</p>
+          </div>
+        </article>
+
+        <article class="pin">
+          <img
+            src="https://images.unsplash.com/photo-1623630524058-622b7fa9ecd7?q=80&w=1334&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="City rooftop"
+          />
+          <div class="pin-meta">
+            <h3>City Rooftop Loft</h3>
+            <p>From ₹5,300 / night</p>
+          </div>
+        </article>
+
+        <article class="pin">
+          <img
+            src="https://images.unsplash.com/photo-1451440063999-77a8b2960d2b?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Countryside"
+          />
+          <div class="pin-meta">
+            <h3>Countryside Cottage</h3>
+            <p>From ₹2,300 / night</p>
+          </div>
+        </article>
+
+        <article class="pin">
+          <img
+            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Island"
+          />
+          <div class="pin-meta">
+            <h3>Island Hideaway</h3>
+            <p>From ₹3,600 / night</p>
+          </div>
+        </article>
+
+        <article class="pin">
+          <img
+            src="https://images.unsplash.com/photo-1613169620329-6785c004d900?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Desert glamping"
+          />
+          <div class="pin-meta">
+            <h3>Desert Glamping</h3>
+            <p>From ₹3,390 / night</p>
+          </div>
+        </article>
+
+        <!-- Add more pins as needed or loop from your listings (EJS) -->
+      </div>
+    </section>
+
+    <!-- ===== CTA FOOTER ===== -->
+    <section class="final-cta">
+      <div class="wrap">
+        <h2>Ready to discover your next stay?</h2>
+        <a href="/listings" class="btn-cta">Start exploring</a>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div>© <span id="year"></span> StayBnb — Made with ♥</div>
+    </footer>
+
+
+    
+    <script>
+      // put current year in footer
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+
+    <script>
+      const reveals = document.querySelectorAll(".reveal");
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+            }
+          });
+        },
+        { threshold: 0.2 }
+      );
+
+      reveals.forEach((el) => observer.observe(el));
+    </script>
+  </body>
+</html>

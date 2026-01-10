@@ -1,0 +1,372 @@
+<% layout("/layouts/Boilerplate") %>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<style>
+  body {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    background-color: #f8f7f3;
+    color: #2c2c2c;
+  }
+  .container-center {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .listing-title {
+    font-size: 30.8px;
+    margin: 1rem 0 0.5rem 0;
+    text-align: start;
+  }
+  .listing-flex {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .listing-img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 30px;
+    margin-bottom: 1rem;
+  }
+  .listing-info {
+    padding-left: 0;
+    width: 100%;
+  }
+  .listing-info p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: #444;
+    text-align: left;
+  }
+  .action-btns {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  .action-btns a,
+  .action-btns button {
+    text-decoration: none;
+    font-family: "Playfair Display", serif;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.4rem;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-edit {
+    background-color: #ff5a5f;
+    color: #fff;
+  }
+  .btn-edit:hover {
+    background-color: #e14c50;
+  }
+  .btn-delete {
+    background-color: #2c2c2c;
+    color: #fff;
+  }
+  .btn-delete:hover {
+    background-color: #444;
+  }
+  .btn-back {
+    background-color: #999;
+    color: #fff;
+  }
+  .btn-back:hover {
+    background-color: #777;
+  }
+  .review-form {
+    margin: 1rem 0;
+    text-align: left;
+  }
+  .review-form textarea {
+    resize: none;
+    width: 100%;
+  }
+  .review-card {
+    border-bottom: 1px solid #ddd;
+    padding: 0.5rem 0;
+    text-align: left;
+  }
+  .star-rating {
+    display: inline-block;
+    font-size: 1.5rem;
+    color: #ccc;
+    cursor: pointer;
+  }
+  .star-rating .fa-star.active,
+  .star-rating .fa-star.hovered {
+    color: gold;
+  }
+  #map {
+    width: 100%;
+    height: 400px;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin: 2rem 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  #map:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+  @media (max-width: 768px) {
+    .show-img {
+      height: 180px;
+    }
+    .listing-title {
+      font-size: 1.5rem;
+    }
+    .star-rating {
+      font-size: 1.2rem;
+    }
+  }
+</style>
+
+<div class="container-center">
+  <!-- Title -->
+  <div class="listing-title"><%= listing.title %></div>
+
+  <!-- Image + Info -->
+  <div class="listing-flex">
+    <img
+      src="<%= listing.image.url %>"
+      alt="listing_image"
+      class="listing-img"
+    />
+    <div class="listing-info">
+      <p>
+       <% if (listing.owner && listing.owner.username) { %>
+         <p><b>Owner:</b> <%= listing.owner.username %></p>
+       <% } %>
+      </p>
+      <p><b>Description:</b> <%= listing.description %></p>
+      <p><b>Price:</b> &#8377;<%= listing.price.toLocaleString("en-IN") %></p>
+      <p><b>Location:</b> <%= listing.location %>, <%= listing.country %></p>
+      <p><b>Category:</b> <%= listing.category %></p>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+<div class="action-btns">
+  <% if ( currUser && listing.owner && currUser._id && listing.owner._id && currUser._id.toString() === listing.owner._id.toString() ) { %>
+    <a href="/listings/<%= listing._id %>/edit" class="btn btn-warning">Edit Listing</a>
+    
+    <form 
+      action="/listings/<%= listing._id %>?_method=DELETE" 
+      method="POST" 
+      style="display:inline"
+    >
+      <button type="submit" class="btn btn-danger">Delete Listing</button>
+    </form>
+  <% } %>
+
+  <!-- Always visible -->
+  <a href="/listings" class="btn-back">Back to Listings</a>
+</div>
+
+  <hr />
+
+  <!-- Review Form -->
+  <% if(currUser) { %>
+  <div class="review-form">
+    <h4>Leave a Review</h4>
+    <form id="reviewForm">
+      <div class="mb-2">
+        <label><b>Rating:</b></label
+        ><br />
+        <span class="star-rating">
+          <% for(let i=1;i<=5;i++){ %>
+          <i class="fa fa-star" data-value="<%= i %>"></i>
+          <% } %>
+        </span>
+        <input
+          type="hidden"
+          name="review[rating]"
+          id="rating-value"
+          value="5"
+        />
+      </div>
+      <div class="mb-2">
+        <label><b>Comment:</b></label>
+        <textarea
+          name="review[comment]"
+          rows="3"
+          class="form-control"
+          id="commentInput"
+          placeholder="Leave a comment"
+          required
+        ></textarea>
+      </div>
+      <button type="submit" class="btn-edit">Submit</button>
+    </form>
+  </div>
+  <% } %>
+
+  <!-- All Reviews -->
+  <div id="reviewsContainer">
+    <% if(listing.reviews && listing.reviews.length > 0) { %>
+    <h4>All Reviews</h4>
+    <% listing.reviews.forEach(review => { %>
+    <div class="review-card">
+      <h5>@<%= review.author ? review.author.username : 'Anonymous' %></h5>
+      <p>
+        <% for(let i=1;i<=5;i++){ %>
+        <i
+          class="fa fa-star"
+          style="color:<%= i <= review.rating ? 'gold' : '#ccc' %>"
+        ></i>
+        <% } %>
+      </p>
+      <p><%= review.comment %></p>
+      <% if(currUser && review.author && currUser._id.toString() ===
+      review.author._id.toString()) { %>
+      <form
+        action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
+        method="POST"
+      >
+        <button class="btn-delete btn-sm mt-1">Delete</button>
+      </form>
+      <% } %>
+    </div>
+    <% }) %> <% } %>
+  </div>
+
+  <hr />
+
+  <!-- Map Section -->
+  <div class="col-12 mt-3 mb-2">
+    <h3 style="margin-bottom: 1rem">Where you'll be</h3>
+    <div id="map"></div>
+  </div>
+
+  <% if(currUser) { %>
+  <script>
+    // Handle review form submission - only if user is logged in
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm) {
+      reviewForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const rating = document.getElementById('rating-value').value;
+        const comment = document.getElementById('commentInput').value;
+        const listingId = '<%= listing._id %>';
+        const currUserUsername = '<%= currUser.username %>';
+        
+        try {
+          const response = await fetch(`/listings/${listingId}/reviews`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Accept': 'application/json'
+            },
+            body: `review[rating]=${rating}&review[comment]=${encodeURIComponent(comment)}`
+          });
+          
+          if (response.ok) {
+            // Get JSON response (contains reviewId)
+            const data = await response.json();
+            const reviewId = data.reviewId;
+
+            // Create review card and add to the reviews container
+            const reviewCard = document.createElement('div');
+            reviewCard.className = 'review-card';
+            
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+              const color = i <= rating ? 'gold' : '#ccc';
+              starsHtml += `<i class="fa fa-star" style="color:${color}"></i>`;
+            }
+
+            // Delete form HTML (so user can delete immediately)
+            const deleteForm = `
+              <form action="/listings/${listingId}/reviews/${reviewId}?_method=DELETE" method="POST" style="display:inline">
+                <button type="submit" class="btn-delete btn-sm mt-1">Delete</button>
+              </form>
+            `;
+
+            reviewCard.innerHTML = `
+              <h5>@${currUserUsername}</h5>
+              <p>${starsHtml}</p>
+              <p>${comment}</p>
+              ${deleteForm}
+            `;
+
+            // Add "All Reviews" heading if it doesn't exist
+            let container = document.getElementById('reviewsContainer');
+            if (!container.querySelector('h4')) {
+              const heading = document.createElement('h4');
+              heading.textContent = 'All Reviews';
+              container.insertBefore(heading, container.firstChild);
+            }
+
+            container.appendChild(reviewCard);
+
+            // Reset form
+            document.getElementById('reviewForm').reset();
+            document.getElementById('rating-value').value = '5';
+            document.querySelectorAll('.star-rating .fa-star').forEach(s => s.classList.remove('active', 'hovered'));
+            document.querySelectorAll('.star-rating .fa-star')[4].classList.add('active');
+          }
+        } catch (error) {
+          console.error('Error submitting review:', error);
+        }
+      });
+    }
+  </script>
+  <% } %>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const listingData = <%- JSON.stringify(listing) %>;
+      if (!listingData || !listingData.location || !listingData.country) return;
+
+      const query = encodeURIComponent(listingData.location + ", " + listingData.country);
+
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data || data.length === 0) return;
+
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+
+          const map = L.map('map').setView([lat, lng], 13);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+          }).addTo(map);
+
+          L.marker([lat, lng])
+            .addTo(map)
+            .bindPopup(`<b>${listingData.title}</b><br>${listingData.location}, ${listingData.country}`)
+            .openPopup();
+
+          setTimeout(() => map.invalidateSize(), 100);
+        });
+    });
+
+    const stars = document.querySelectorAll(".star-rating .fa-star");
+    const ratingInput = document.getElementById("rating-value");
+    stars.forEach(star => {
+      star.addEventListener("mouseover", () => {
+        const val = star.dataset.value;
+        stars.forEach(s => s.classList.remove("hovered"));
+        for (let i=0;i<val;i++) stars[i].classList.add("hovered");
+      });
+      star.addEventListener("mouseout", () => stars.forEach(s => s.classList.remove("hovered")));
+      star.addEventListener("click", () => {
+        const val = star.dataset.value;
+        ratingInput.value = val;
+        stars.forEach((s,i)=> i<val?s.classList.add("active"):s.classList.remove("active"));
+      });
+    });
+  </script>
+</div>

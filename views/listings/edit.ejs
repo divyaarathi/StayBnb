@@ -1,0 +1,99 @@
+<% layout("/layouts/Boilerplate") %>
+
+<div class="row">
+  <div class="col-8 offset-2">
+
+    <% if (listing) { %>
+      <form action="/listings/<%= listing._id %>?_method=PUT" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
+
+        <!-- Title -->
+         <h3>Edit your listing</h3>
+        <div class="mb-3">
+          <label for="title" class="form-label">Title</label>
+          <input type="text" name="title" value="<%= listing.title %>" class="form-control" required>
+          <div class="valid-feedback">Title looks good!</div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea name="description" class="form-control" required><%= listing.description %></textarea>
+          <div class="invalid-feedback">Description required!</div>
+        </div>
+
+        <!-- Original Image -->
+        <p>Original listing image:</p>
+        <div class="mb-3">
+          <img id="current-image" src="<%= originalImage %>" alt="listing image" class="img-fluid" style="max-height: 250px; border-radius: 12px;">
+        </div>
+
+        <!-- Upload New Image -->
+        <div class="mb-3">
+          <label for="image" class="form-label">Change Image</label>
+          <input type="file" name="image" id="image-input" class="form-control">
+        </div>
+
+        <!-- Price and Location -->
+        <div class="row">
+          <div class="mb-3 col-md-4">
+            <label for="price" class="form-label">Price</label>
+            <input type="number" name="price" value="<%= listing.price %>" class="form-control" required>
+            <div class="invalid-feedback">Invalid price!</div>
+          </div>
+          <div class="mb-3 col-md-8">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" name="location" value="<%= listing.location %>" class="form-control" required>
+            <div class="invalid-feedback">Location required!</div>
+          </div>
+        </div>
+
+        <!-- Country -->
+        <div class="mb-3">
+          <label for="country" class="form-label">Country</label>
+          <input type="text" name="country" value="<%= listing.country %>" class="form-control" required>
+          <div class="invalid-feedback">Please enter a valid country!</div>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-3">
+          <label for="category">Type of listing:</label>
+          <select name="category" id="category" class="form-select">
+            <% const categories = ["trending","room","castle","farm","pool","boat","beach","dome","arctic","camping","iconic-cities","mountain"]; %>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat %>" <%= listing.category === cat ? 'selected' : '' %>>
+                <%= cat.charAt(0).toUpperCase() + cat.slice(1).replace('-', ' ') %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+
+        <button class="btn btn-dark add-btn">Edit Listing</button>
+        <a href="/listings" class="btn btn-secondary" style="background-color:#5a6268 !important;  border:none;">
+  Back to Listing
+</a>
+
+      </form>
+
+      <script>
+        // Image preview for new upload
+        const imageInput = document.getElementById("image-input");
+        const currentImage = document.getElementById("current-image");
+
+        imageInput.addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+              currentImage.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      </script>
+
+    <% } else { %>
+      <p class="text-danger">Listing not found!</p>
+    <% } %>
+
+  </div>
+</div>
