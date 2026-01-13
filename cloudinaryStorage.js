@@ -15,7 +15,7 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'StayBnb',         // folder in Cloudinary
-    allowed_formats: ['jpeg', 'png', 'jpg'],
+    allowedformats: ['jpeg', 'png', 'jpg'],
   },
 });
 

@@ -64,10 +64,20 @@ router.get("/new", isLoggedIn, listingsController.renderNewForm);
 router.post(
   "/",
   isLoggedIn,
-  upload.single("image"), // ✅ Cloudinary image upload
-  validateListing,
-  wrapAsync(listingsController.postListing)
+  upload.single("image"),
+  wrapAsync(async (req, res) => {
+    const listing = new Listing(req.body.listing);
+
+    listing.image = {
+      url: req.file.path,       // ✅ Cloudinary URL
+      filename: req.file.filename,
+    };
+
+    await listing.save();
+    res.redirect("/listings");
+  })
 );
+
 
 // EDIT – form
 router.get("/:id/edit", isLoggedIn, isOwner, wrapAsync(listingsController.editListing));
