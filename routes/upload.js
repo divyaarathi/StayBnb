@@ -1,8 +1,13 @@
+// routes/upload.js
 const express = require('express');
 const router = express.Router();
-const upload = require('../multerConfig');
-const cloudinary = require('../cloudConfig');
+const multer = require('multer');
+const { cloudinary } = require('../cloudinaryStorage'); // use our existing cloudinaryStorage.js
 const streamifier = require('streamifier');
+
+// Use multer memory storage for streaming upload
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 router.post('/upload', upload.single('image'), async (req, res) => {
   try {
@@ -12,7 +17,7 @@ router.post('/upload', upload.single('image'), async (req, res) => {
     const streamUpload = (fileBuffer) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-          { folder: 'AirbnbUploads' },
+          { folder: 'AirbnbUploads' }, // Cloudinary folder
           (error, result) => {
             if (result) resolve(result);
             else reject(error);
@@ -23,7 +28,7 @@ router.post('/upload', upload.single('image'), async (req, res) => {
     };
 
     const result = await streamUpload(req.file.buffer);
-    res.json({ url: result.secure_url });
+    res.json({ url: result.secure_url }); // return uploaded file URL
 
   } catch (err) {
     console.error(err);

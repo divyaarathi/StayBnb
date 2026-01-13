@@ -74,8 +74,11 @@ module.exports.postListing = async (req, res) => {
 
     // Assign uploaded image
     if (req.file) {
+      console.log("Uploaded file:", req.file);
       const { path: url, filename } = req.file;
       listing.image = { url, filename };
+      } else {
+  console.log("No file uploaded!");
     }
 
     // Assign logged-in user as owner
