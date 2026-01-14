@@ -108,12 +108,14 @@ app.use("/", usersRoute);
 app.use('/api', uploadRoute);
 
 // ------------------ LOGOUT ROUTE ------------------
-app.get("/logout", (req, res) => {
-  req.logout(() => {
+app.get("/logout", (req, res, next) => {
+  req.logout(function (err) {
+    if (err) return next(err);
     req.flash("success", "Logged out successfully!");
-    res.redirect("/exit");
+    return res.redirect("/exit");
   });
 });
+
 
 // ------------------ EXIT PAGE ROUTE ------------------
 app.get("/exit", (req, res) => {
@@ -127,10 +129,13 @@ app.all(/.*/, (req, res, next) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
   const { statusCode = 500 } = err;
-  const message = err.message || "Something went wrong";
-  res.status(statusCode).render("error.ejs", { err, message });
+  res.status(statusCode).render("error", { err });
 });
+
 
 // ------------------ Server ------------------
 app.listen(8080, () => {
