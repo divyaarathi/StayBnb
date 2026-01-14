@@ -129,11 +129,18 @@ app.all(/.*/, (req, res, next) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  if (res.headersSent) {
-    return next(err);
+  const statusCode = err.statusCode || 500;
+
+  // FORCE message to always be a string
+  let message = "Something went wrong";
+  if (err && typeof err.message === "string" && err.message.length > 0) {
+    message = err.message;
   }
-  const { statusCode = 500 } = err;
-  res.status(statusCode).render("error", { err });
+
+  res.status(statusCode).render("error", {
+    err,
+    message: String(message), // 💥 THIS IS THE KEY
+  });
 });
 
 
