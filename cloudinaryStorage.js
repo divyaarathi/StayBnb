@@ -1,30 +1,38 @@
+// cloudinaryStorage.js
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const multer = require("multer");
 
-// ❌ remove dotenv here (Render ignores .env files)
-// require("dotenv").config();
-
+// ------------------ Cloudinary Config ------------------
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_KEY,
-  api_secret: process.env.CLOUDINARY_SECRET,
+  cloud_name: process.env.CLOUD_NAME,       // matches your .env
+  api_key: process.env.CLOUD_API_KEY,      // matches your .env
+  api_secret: process.env.CLOUD_API_SECRET // matches your .env
 });
 
-// Warn at runtime if env vars are missing so Render logs surface the issue.
+// ------------------ Warn if env vars are missing ------------------
 const missing = [];
-if (!process.env.CLOUDINARY_CLOUD_NAME) missing.push('CLOUDINARY_CLOUD_NAME');
-if (!process.env.CLOUDINARY_KEY) missing.push('CLOUDINARY_KEY');
-if (!process.env.CLOUDINARY_SECRET) missing.push('CLOUDINARY_SECRET');
+if (!process.env.CLOUD_NAME) missing.push("CLOUD_NAME");
+if (!process.env.CLOUD_API_KEY) missing.push("CLOUD_API_KEY");
+if (!process.env.CLOUD_API_SECRET) missing.push("CLOUD_API_SECRET");
+
 if (missing.length) {
-  // Use console.error so Render/Heroku logs show prominently
-  console.error(`Cloudinary env vars missing: ${missing.join(', ')}.\nPlease set them in your Render service environment settings.`);
+  console.error(
+    `Cloudinary env vars missing: ${missing.join(", ")}.\n` +
+    "Please set them in your Render service environment settings."
+  );
 }
+
+// ------------------ Cloudinary Storage ------------------
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: "StayBnb",
-    allowedFormats: ["jpeg", "png", "jpg"], // ✅ FIXED
+    folder: "StayBnb",                     // folder in Cloudinary
+    allowed_formats: ["jpeg", "jpg", "png", "webp"], // supported image formats
   },
 });
 
-module.exports = { cloudinary, storage };
+// ------------------ Multer Upload ------------------
+const upload = multer({ storage });
+
+module.exports = { cloudinary, storage, upload };

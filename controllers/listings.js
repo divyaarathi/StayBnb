@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Listing = require("../models/listing");
 const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
-require("dotenv").config();
 
 const geocodingClient = mbxGeocoding({
   accessToken: process.env.MAPBOX_TOKEN,
@@ -9,7 +8,7 @@ const geocodingClient = mbxGeocoding({
 
 // ---------------- NEW LISTING FORM ----------------
 module.exports.renderNewForm = (req, res) => {
-  return res.render("listings/new");
+  res.render("listings/new");
 };
 
 // ---------------- SHOW LISTING ----------------
@@ -30,18 +29,19 @@ module.exports.showListing = async (req, res) => {
     return res.redirect("/listings");
   }
 
-  return res.render("listings/show", { listing, currUser: req.user });
+  res.render("listings/show", { listing, currUser: req.user });
 };
 
 // ---------------- CREATE LISTING ----------------
 module.exports.postListing = async (req, res) => {
   try {
     const listingData = req.body.Listing;
-    if (!listingData || !listingData.category) {
+    if (!listingData?.category) {
       req.flash("error", "Category is required.");
       return res.redirect("back");
     }
 
+    // 🌍 Geocoding
     const geoResponse = await geocodingClient
       .forwardGeocode({
         query: `${listingData.location}, ${listingData.country}`,
@@ -51,16 +51,17 @@ module.exports.postListing = async (req, res) => {
 
     const listing = new Listing(listingData);
 
-    if (req.file) {
-      listing.image = {
-        url: req.file.path,
-        filename: req.file.filename,
-      };
+    // ✅ MULTIPLE IMAGES
+    if (req.files && req.files.length > 0) {
+      listing.images = req.files.map(file => ({
+        url: file.path,
+        filename: file.filename
+      }));
     }
 
     listing.owner = req.user._id;
     listing.geometry =
-      geoResponse.body.features[0]?.geometry || {
+      geoResponse.body?.features?.[0]?.geometry || {
         type: "Point",
         coordinates: [0, 0],
       };
@@ -68,11 +69,11 @@ module.exports.postListing = async (req, res) => {
     await listing.save();
 
     req.flash("success", "Listing created!");
-    return res.redirect("/listings");
+    res.redirect(`/listings/${listing._id}`);
   } catch (err) {
     console.error(err);
     req.flash("error", "Failed to create listing.");
-    return res.redirect("/listings/new");
+    res.redirect("/listings/new");
   }
 };
 
@@ -91,17 +92,12 @@ module.exports.editListing = async (req, res) => {
     return res.redirect("/listings");
   }
 
-  return res.render("listings/edit", { listing });
+  res.render("listings/edit", { listing });
 };
 
 // ---------------- UPDATE LISTING ----------------
 module.exports.updateListing = async (req, res) => {
   const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    req.flash("error", "Invalid listing ID.");
-    return res.redirect("/listings");
-  }
 
   try {
     const listing = await Listing.findById(id);
@@ -110,22 +106,39 @@ module.exports.updateListing = async (req, res) => {
       return res.redirect("/listings");
     }
 
+    // Update text fields
     Object.assign(listing, req.body.Listing);
 
-    if (req.file) {
-      listing.image = {
-        url: req.file.path,
-        filename: req.file.filename,
-      };
+    // ✅ ADD NEW IMAGES (DO NOT DELETE OLD)
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map(file => ({
+        url: file.path,
+        filename: file.filename
+      }));
+      listing.images.push(...newImages);
+    }
+
+    // 🌍 Update map location
+    if (req.body.Listing?.location && req.body.Listing?.country) {
+      const geoResponse = await geocodingClient
+        .forwardGeocode({
+          query: `${req.body.Listing.location}, ${req.body.Listing.country}`,
+          limit: 1,
+        })
+        .send();
+
+      listing.geometry =
+        geoResponse.body?.features?.[0]?.geometry || listing.geometry;
     }
 
     await listing.save();
+
     req.flash("success", "Listing updated!");
-    return res.redirect(`/listings/${id}`);
+    res.redirect(`/listings/${id}`);
   } catch (err) {
     console.error(err);
     req.flash("error", "Update failed.");
-    return res.redirect("back");
+    res.redirect("back");
   }
 };
 
@@ -140,20 +153,17 @@ module.exports.deleteListing = async (req, res) => {
 
   await Listing.findByIdAndDelete(id);
   req.flash("success", "Listing deleted!");
-  return res.redirect("/listings");
+  res.redirect("/listings");
 };
 
 // ---------------- INDEX ----------------
 module.exports.index = async (req, res) => {
   try {
     const allLists = await Listing.find({}).populate("owner");
-    return res.render("listings/index", {
-      allLists,
-      currUser: req.user,
-    });
+    res.render("listings/index", { allLists, currUser: req.user });
   } catch (err) {
     console.error(err);
     req.flash("error", "Server error");
-    return res.redirect("/");
+    res.redirect("/");
   }
 };

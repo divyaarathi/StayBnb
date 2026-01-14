@@ -1,7 +1,7 @@
-<% layout("/layouts/Boilerplate") %>
+<% layout("/layouts/boilerplate") %>
 <style>
   @media (max-width: 480px) {
-    .col-6{
+    .col-6 {
       width: 100% !important;
       margin: 0 !important;
     }
@@ -19,12 +19,24 @@
     <form action="/signup" method="post" class="needs-validation" novalidate>
       <div class="mb-3">
         <label for="username" class="form-label">Username</label>
-        <input type="text" name="username" id="username" class="form-control" required />
+        <input
+          type="text"
+          name="username"
+          id="username"
+          class="form-control"
+          required
+        />
         <div class="valid-feedback">Looks good!</div>
       </div>
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
-        <input type="email" name="email" id="email" class="form-control" required />
+        <input
+          type="email"
+          name="email"
+          id="email"
+          class="form-control"
+          required
+        />
       </div>
       <div class="mb-3">
         <label for="password" class="form-label">Password</label>
@@ -33,12 +45,18 @@
           name="password"
           id="password"
           class="form-control"
-          required 
+          required
         />
         <div class="invalid-feedback">Password required!</div>
       </div>
-      <button class="btn btn-success" style="margin-left: 15rem;">Submit</button>
-      <p class="para" style="margin-left: 11rem; margin-top: 0.5rem;">Already have an account?<a href="/login" style="text-decoration: none; color: #fe424d;"><b>&nbsp;Login</b></a> </p>
+      <button class="btn btn-success" style="margin-left: 15rem">Submit</button>
+      <p class="para" style="margin-left: 11rem; margin-top: 0.5rem">
+        Already have an account?<a
+          href="/login"
+          style="text-decoration: none; color: #fe424d"
+          ><b>&nbsp;Login</b></a
+        >
+      </p>
     </form>
   </div>
 </div>
