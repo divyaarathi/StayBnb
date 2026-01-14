@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Error</title>
-  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
@@ -15,7 +14,9 @@
     </h4>
 
     <p>
-      <%= message || "An unexpected error occurred." %>
+      <%= (typeof message === "string" && message.length > 0)
+          ? message
+          : "An unexpected error occurred." %>
     </p>
 
     <a href="/">Go back home</a>
