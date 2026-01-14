@@ -75,10 +75,11 @@ module.exports.postListing = async (req, res) => {
     // Assign uploaded image
     if (req.file) {
       console.log("Uploaded file:", req.file);
-      const { path: url, filename } = req.file;
+      const url = req.file.path || req.file.secure_url || req.file.url || null;
+      const filename = req.file.filename || null;
       listing.image = { url, filename };
-      } else {
-  console.log("No file uploaded!");
+    } else {
+      console.log("No file uploaded!");
     }
 
     // Assign logged-in user as owner
@@ -195,7 +196,8 @@ module.exports.updateListing = async (req, res) => {
 
     // Update image if uploaded
     if (req.file) {
-      const { path: url, filename } = req.file;
+      const url = req.file.path || req.file.secure_url || req.file.url || null;
+      const filename = req.file.filename || null;
       listing.image = { url, filename };
       await listing.save();
     }

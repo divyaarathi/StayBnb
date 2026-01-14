@@ -68,10 +68,13 @@ router.post(
   wrapAsync(async (req, res) => {
     const listing = new Listing(req.body.listing);
 
-    listing.image = {
-      url: req.file.path,       // ✅ Cloudinary URL
-      filename: req.file.filename,
-    };
+    // Only assign image if a file was uploaded. Use fallback for different
+    // Cloudinary field names (`path`, `secure_url`, `url`).
+    if (req.file) {
+      const url = req.file.path || req.file.secure_url || req.file.url || null;
+      const filename = req.file.filename || null;
+      listing.image = { url, filename };
+    }
 
     await listing.save();
     res.redirect("/listings");
