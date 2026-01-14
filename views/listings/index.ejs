@@ -1,7 +1,7 @@
 <% layout("/layouts/Boilerplate") %>
 <style>
   /*  Horizontal filters container */
-#filters {
+  #filters {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
@@ -191,15 +191,19 @@
 </div>
 
 <div class="row row-cols-lg-3 row-cols-md-2 mt-2 row-cols-sm-1">
-  <% for(let listing of allLists) { %>
+  <% for(let listing of allLists) { %> <% let imageUrl = null; if (typeof
+  listing.image === 'string') imageUrl = listing.image; else if (listing.image
+  && listing.image.url) imageUrl = listing.image.url; else imageUrl =
+  '/images/placeholder.png'; %>
   <div class="col mb-4">
     <div class="card listing-card">
       <a href="/listings/<%= listing._id %>">
         <img
-          src="<%= listing.image.url %>"
+          src="<%= imageUrl %>"
           class="card-img-top list"
           alt="listingimage"
           style="height: 20rem"
+          loading="lazy"
         />
       </a>
       <div class="card-body">
