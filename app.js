@@ -44,7 +44,6 @@ if (!process.env.SESSION_SECRET) {
 }
 
 
-
 // ------------------ MongoDB Connection ------------------
 mongoose
   .connect(dbUrl)
@@ -87,7 +86,7 @@ app.use(
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
     },
   })
 );
@@ -155,7 +154,7 @@ app.use((err, req, res, next) => {
 
 
 // ------------------ Server ------------------
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
