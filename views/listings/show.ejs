@@ -37,10 +37,10 @@
 <div class="container-center">
   <div class="listing-title"><%= listing.title %></div>
 
+  <!-- Debug (optional, remove later) -->
   <pre style="background: #eee; padding: 10px">
 <%= JSON.stringify(listing.image, null, 2) %>
-</pre
-  >
+  </pre>
 
   <% let imageUrl = null; if (typeof listing.image === "string") { imageUrl =
   listing.image; } else if (listing.image && listing.image.url) { imageUrl =
@@ -64,7 +64,6 @@
   <div class="action-btns">
     <% if ( currUser && listing.owner && currUser._id.toString() ===
     listing.owner._id.toString() ) { %>
-
     <a href="/listings/<%= listing._id %>/edit" class="btn btn-warning">
       Edit Listing
     </a>
@@ -89,24 +88,43 @@
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       const listing = <%- JSON.stringify(listing) %>;
-      if (!listing.location || !listing.country) return;
 
-      const query = encodeURIComponent(listing.location + ", " + listing.country);
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${query}`
-      );
-      const data = await res.json();
-      if (!data.length) return;
+      if (!listing || !listing.location || !listing.country) return;
 
-      const lat = data[0].lat;
-      const lng = data[0].lon;
+      try {
+        const query = encodeURIComponent(
+          listing.location + ", " + listing.country
+        );
 
-      const map = L.map("map").setView([lat, lng], 13);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${query}`
+        );
 
-      L.marker([lat, lng]).addTo(map)
-        .bindPopup(`<b>${listing.title}</b>`)
-        .openPopup();
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) return;
+
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+
+        if (isNaN(lat) || isNaN(lng)) return;
+
+        const map = L.map("map").setView([lat, lng], 13);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+        }).addTo(map);
+
+        L.marker([lat, lng])
+          .addTo(map)
+          .bindPopup(`<b>${listing.title}</b>`)
+          .openPopup();
+
+      } catch (err) {
+        console.error("Map error:", err);
+      }
     });
   </script>
 </div>

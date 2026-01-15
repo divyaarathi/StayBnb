@@ -36,6 +36,7 @@ module.exports.showListing = async (req, res) => {
 module.exports.postListing = async (req, res) => {
   try {
     const listingData = req.body.Listing;
+
     if (!listingData?.category) {
       req.flash("error", "Category is required.");
       return res.redirect("back");
@@ -51,15 +52,16 @@ module.exports.postListing = async (req, res) => {
 
     const listing = new Listing(listingData);
 
-    // ✅ MULTIPLE IMAGES
-    if (req.files && req.files.length > 0) {
-      listing.images = req.files.map(file => ({
-        url: file.path,
-        filename: file.filename
-      }));
+    // ✅ SINGLE IMAGE (SAFE)
+    if (req.file) {
+      listing.image = {
+        url: req.file.path,
+        filename: req.file.filename,
+      };
     }
 
     listing.owner = req.user._id;
+
     listing.geometry =
       geoResponse.body?.features?.[0]?.geometry || {
         type: "Point",
@@ -109,13 +111,12 @@ module.exports.updateListing = async (req, res) => {
     // Update text fields
     Object.assign(listing, req.body.Listing);
 
-    // ✅ ADD NEW IMAGES (DO NOT DELETE OLD)
-    if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(file => ({
-        url: file.path,
-        filename: file.filename
-      }));
-      listing.images.push(...newImages);
+    // ✅ SINGLE IMAGE UPDATE (SAFE)
+    if (req.file) {
+      listing.image = {
+        url: req.file.path,
+        filename: req.file.filename,
+      };
     }
 
     // 🌍 Update map location
