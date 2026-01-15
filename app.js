@@ -136,11 +136,21 @@ app.use((req, res, next) => {
 // ------------------ ERROR HANDLER ------------------
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
+  const message =
+    err.message && err.message.length
+      ? err.message
+      : "Something went wrong";
+
+  if (res.headersSent) {
+    return;
+  }
+
   res.status(statusCode).render("error", {
     err,
-    message: err.message || "Something went wrong",
+    message,
   });
 });
+
 
 // ------------------ Server ------------------
 const PORT = process.env.PORT || 10000;
