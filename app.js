@@ -1,49 +1,56 @@
 // ------------------ Load environment variables ------------------
 if (process.env.NODE_ENV !== "production") {
-  require('dotenv').config();
+  require("dotenv").config();
 }
 
 // ------------------ Import packages ------------------
-const express = require('express');
-const mongoose = require('mongoose');
-const path = require('path');
+const express = require("express");
+const mongoose = require("mongoose");
+const path = require("path");
 const methodOverride = require("method-override");
-const ejsMate = require('ejs-mate');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const flash = require('connect-flash');
-const passport = require('passport');
-const LocalStrategy = require('passport-local');
+const ejsMate = require("ejs-mate");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
 
 // ------------------ Import Models ------------------
-const Listing = require('./models/listing.js');
-const User = require('./models/user.js');
+const User = require("./models/user.js");
 
 // ------------------ Utilities ------------------
-const wrapAsync = require('./utils/wrapAsync.js');
-const ExpressError = require('./utils/ExpressError.js');
-const { listingSchema } = require('./schema.js');
+const ExpressError = require("./utils/ExpressError.js");
 
 // ------------------ Import Routes ------------------
-const listingsRoute = require('./routes/listing');
-const reviewsRoute = require('./routes/review');
-const usersRoute = require('./routes/users');
-const uploadRoute = require('./routes/upload');
+const listingsRoute = require("./routes/listing");
+const reviewsRoute = require("./routes/review");
+const usersRoute = require("./routes/users");
+const uploadRoute = require("./routes/upload");
 
 // ------------------ Initialize app ------------------
 const app = express();
 
+// IMPORTANT for Render / HTTPS cookies
+app.set("trust proxy", 1);
 
-// Support multiple env var names for DB URL (DB_URL, ATLASDB_URL, MONGO_URL)
-const dbUrl = process.env.DB_URL || process.env.ATLASDB_URL || process.env.MONGO_URL;
+// ------------------ Database URL ------------------
+const dbUrl =
+  process.env.DB_URL ||
+  process.env.ATLASDB_URL ||
+  process.env.MONGO_URL;
+
+if (!dbUrl) {
+  throw new Error("❌ MongoDB connection URL is missing");
+}
 
 // ------------------ MongoDB Connection ------------------
-async function main() {
-  await mongoose.connect(dbUrl);
-}
-main()
+mongoose
+  .connect(dbUrl)
   .then(() => console.log("MongoDB connected successfully"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
+  });
 
 // ------------------ App Config ------------------
 app.engine("ejs", ejsMate);
@@ -55,44 +62,45 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // ------------------ SESSION CONFIG ------------------
-// ------------------ SESSION CONFIG ------------------
 const store = MongoStore.create({
-  mongoUrl: process.env.DB_URL || process.env.MONGO_URL,
-  touchAfter: 24 * 60 * 60, // time in seconds
-  crypto: { 
-    secret: process.env.SESSION_SECRET || "thisshouldbeverysecret",
+  mongoUrl: dbUrl,
+  crypto: {
+    secret: process.env.SESSION_SECRET,
   },
-  stringify: false, // important to prevent JSON parse errors
+  touchAfter: 24 * 60 * 60, // 1 day
 });
 
-store.on("error", e => console.log("SESSION STORE ERROR:", e));
+store.on("error", (e) => {
+  console.error("SESSION STORE ERROR:", e);
+});
 
-const sessionOptions = {
-  store,
-  secret: process.env.SESSION_SECRET || "thisshouldbeverysecret",
-  resave: false,
-  saveUninitialized: false, // safer than true
-  cookie: {
-    httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production", // only over HTTPS
-  },
-};
-
-app.use(session(sessionOptions));
+app.use(
+  session({
+    store,
+    name: "staybnb-session",
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    },
+  })
+);
 
 app.use(flash());
 
 // ------------------ PASSPORT CONFIG ------------------
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
 
+passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// ------------------ GLOBAL MIDDLEWARE ------------------
+// ------------------ GLOBAL LOCALS ------------------
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
@@ -100,7 +108,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ------------------ HOME PAGE ROUTE ------------------
+// ------------------ HOME ------------------
 app.get("/", (req, res) => {
   res.render("home");
 });
@@ -109,53 +117,33 @@ app.get("/", (req, res) => {
 app.use("/listings", listingsRoute);
 app.use("/listings/:listingId/reviews", reviewsRoute);
 app.use("/", usersRoute);
+app.use("/api", uploadRoute);
 
-// ------------------ Cloudinary Upload Route ------------------
-app.use('/api', uploadRoute);
-
-// ------------------ LOGOUT ROUTE ------------------
+// ------------------ LOGOUT ------------------
 app.get("/logout", (req, res, next) => {
   req.logout(function (err) {
     if (err) return next(err);
     req.flash("success", "Logged out successfully!");
-    return res.redirect("/exit");
+    res.redirect("/");
   });
 });
 
-
-// ------------------ EXIT PAGE ROUTE ------------------
-app.get("/exit", (req, res) => {
-  res.render("exit"); // make sure views/exit.ejs exists
-});
-
-// ------------------ ERROR HANDLING ------------------
-app.all(/.*/, (req, res, next) => {
+// ------------------ 404 ------------------
+app.all("*", (req, res, next) => {
   next(new ExpressError(404, "Page not found!"));
 });
 
-// Global error handler
+// ------------------ ERROR HANDLER ------------------
 app.use((err, req, res, next) => {
-  if (res.headersSent) {
-    return next(err);
-  }
-
   const statusCode = err.statusCode || 500;
-  const message =
-    typeof err.message === "string" && err.message.length
-      ? err.message
-      : "Something went wrong";
-
   res.status(statusCode).render("error", {
     err,
-    message,
+    message: err.message || "Something went wrong",
   });
 });
 
-
-
 // ------------------ Server ------------------
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
-
