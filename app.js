@@ -30,44 +30,36 @@ const uploadRoute = require("./routes/upload");
 // ------------------ Initialize app ------------------
 const app = express();
 
-// IMPORTANT for Render / HTTPS cookies
-app.set("trust proxy", 1);
+// ------------------ App Config ------------------
+app.engine("ejs", ejsMate);
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname, "public")));
 
 // ------------------ Database URL ------------------
-const dbUrl =
-  process.env.DB_URL ||
-  process.env.ATLASDB_URL ||
-  process.env.MONGO_URL;
-
-if (!process.env.SESSION_SECRET) {
-  throw new Error("❌ SESSION_SECRET is missing");
+const dbUrl = process.env.DB_URL || process.env.ATLASDB_URL || process.env.MONGO_URL;
+if (!dbUrl) {
+  throw new Error("❌ DB_URL environment variable is missing!");
 }
-
+if (!process.env.SESSION_SECRET) {
+  throw new Error("❌ SESSION_SECRET environment variable is missing!");
+}
 
 // ------------------ MongoDB Connection ------------------
 mongoose
-  .connect(dbUrl)
+  .connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB connected successfully"))
   .catch((err) => {
     console.error("MongoDB connection error:", err);
     process.exit(1);
   });
 
-// ------------------ App Config ------------------
-app.engine("ejs", ejsMate);
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride("_method"));
-app.use(express.static(path.join(__dirname, "public")));
-
 // ------------------ SESSION CONFIG ------------------
 const store = MongoStore.create({
   mongoUrl: dbUrl,
-  crypto: {
-    secret: process.env.SESSION_SECRET,
-  },
+  crypto: { secret: process.env.SESSION_SECRET },
   touchAfter: 24 * 60 * 60, // 1 day
 });
 
@@ -75,6 +67,7 @@ store.on("error", (e) => {
   console.error("SESSION STORE ERROR:", e);
 });
 
+app.set("trust proxy", 1); // For Render / HTTPS cookies
 app.use(
   session({
     store,
@@ -86,7 +79,7 @@ app.use(
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       sameSite: "lax",
-      secure: false,
+      secure: process.env.NODE_ENV === "production", // only over HTTPS
     },
   })
 );
@@ -137,23 +130,14 @@ app.use((req, res, next) => {
 // ------------------ ERROR HANDLER ------------------
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
-  const message =
-    err.message && err.message.length
-      ? err.message
-      : "Something went wrong";
+  const message = err.message && err.message.length ? err.message : "Something went wrong";
 
-  if (res.headersSent) {
-    return;
-  }
+  if (res.headersSent) return;
 
-  res.status(statusCode).render("error", {
-    err,
-    message,
-  });
+  res.status(statusCode).render("error", { err, message });
 });
 
-
-// ------------------ Server ------------------
+// ------------------ SERVER ------------------
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
