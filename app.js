@@ -34,7 +34,8 @@ const uploadRoute = require('./routes/upload');
 const app = express();
 
 
-const dbUrl=process.env.ATLASDB_URL;
+// Support multiple env var names for DB URL (DB_URL, ATLASDB_URL, MONGO_URL)
+const dbUrl = process.env.DB_URL || process.env.ATLASDB_URL || process.env.MONGO_URL;
 
 // ------------------ MongoDB Connection ------------------
 async function main() {
@@ -57,14 +58,14 @@ app.use(express.static(path.join(__dirname, "public")));
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   touchAfter: 24 * 60 * 60,
-  crypto: { secret: process.env.SECRET  }
+  crypto: { secret: process.env.SESSION_SECRET || process.env.SECRET }
 });
 
 store.on("error", e => console.log("Session store error:", e));
 
 const sessionOptions = {
   store,
-  secret: process.env.SECRET ,
+  secret: process.env.SESSION_SECRET || process.env.SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -148,7 +149,8 @@ app.use((err, req, res, next) => {
 
 
 // ------------------ Server ------------------
-app.listen(8080, () => {
-  console.log("Server listening on port 8080");
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });
 
