@@ -55,28 +55,33 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // ------------------ SESSION CONFIG ------------------
+// ------------------ SESSION CONFIG ------------------
 const store = MongoStore.create({
-  mongoUrl: process.env.DB_URL,
-  touchAfter: 24 * 60 * 60,
-  crypto: { secret: process.env.SESSION_SECRET || process.env.SECRET }
+  mongoUrl: process.env.DB_URL || process.env.MONGO_URL,
+  touchAfter: 24 * 60 * 60, // time in seconds
+  crypto: { 
+    secret: process.env.SESSION_SECRET || "thisshouldbeverysecret",
+  },
+  stringify: false, // important to prevent JSON parse errors
 });
 
-store.on("error", e => console.log("Session store error:", e));
+store.on("error", e => console.log("SESSION STORE ERROR:", e));
 
 const sessionOptions = {
   store,
-  secret: process.env.SESSION_SECRET || process.env.SECRET,
+  secret: process.env.SESSION_SECRET || "thisshouldbeverysecret",
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false, // safer than true
   cookie: {
-    expires: Date.now() + 7*24*60*60*1000,
-    maxAge: 7*24*60*60*1000,
-    httpOnly: true
-  }
+    httpOnly: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production", // only over HTTPS
+  },
 };
 
-
 app.use(session(sessionOptions));
+
 app.use(flash());
 
 // ------------------ PASSPORT CONFIG ------------------
