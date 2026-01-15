@@ -39,9 +39,11 @@ const dbUrl =
   process.env.ATLASDB_URL ||
   process.env.MONGO_URL;
 
-if (!dbUrl) {
-  throw new Error("❌ MongoDB connection URL is missing");
+if (!process.env.SESSION_SECRET) {
+  throw new Error("❌ SESSION_SECRET is missing");
 }
+
+
 
 // ------------------ MongoDB Connection ------------------
 mongoose
