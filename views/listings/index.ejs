@@ -7,7 +7,8 @@
     align-items: center;
     overflow-x: auto;
     white-space: nowrap;
-    padding: 0.5rem 0;
+    padding: 1.5rem 0;
+    margin-top: 1.5rem;
     gap: 2rem;
     width: 100%;
   }
@@ -55,9 +56,10 @@
     font-size: 1.1rem;
     gap: 0.8rem;
     cursor: pointer;
-    background: #fff !important; /* ← Fix: override bootstrap */
+    background: #fff !important;
     transition: border 0.2s, background 0.2s;
-    margin-top: 0.2rem; /* ← PERFECT ALIGNMENT FIX */
+    margin-top: 0.2rem;
+    margin-left: 2rem;
   }
 
   .tax-toggle:hover {
@@ -185,7 +187,11 @@
     class="tax-toggle"
     onclick="document.getElementById('switchCheckDefault').click()"
   >
-    <input type="checkbox" id="switchCheckDefault" class="form-check-input" />
+    <input
+      type="checkbox"
+      id="switchCotal after theckDefault"
+      class="form-check-input"
+    />
     <span class="pill-label">Display taxes</span>
   </div>
 </div>
