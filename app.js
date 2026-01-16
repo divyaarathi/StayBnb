@@ -58,8 +58,7 @@ mongoose
 
 // ------------------ SESSION CONFIG ------------------
 const store = MongoStore.create({
-  client: mongoose.connection,
-  crypto: { secret: process.env.SESSION_SECRET },
+  mongoUrl: dbUrl,
   touchAfter: 24 * 60 * 60, // 1 day
 });
 
