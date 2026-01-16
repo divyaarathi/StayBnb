@@ -362,8 +362,7 @@ body {
   border: none !important;
 }
 
-.add-btn,
-.btn-secondary {
+.add-btn {
   margin-bottom: 2rem !important;
 }
 /* MAIN FILTERS WRAPPER */
