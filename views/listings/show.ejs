@@ -37,11 +37,6 @@
 <div class="container-center">
   <div class="listing-title"><%= listing.title %></div>
 
-  <!-- Debug (optional, remove later) -->
-  <pre style="background: #eee; padding: 10px">
-<%= JSON.stringify(listing.image, null, 2) %>
-  </pre>
-
   <% let imageUrl = null; if (typeof listing.image === "string") { imageUrl =
   listing.image; } else if (listing.image && listing.image.url) { imageUrl =
   listing.image.url; } %> <% if (imageUrl) { %>
