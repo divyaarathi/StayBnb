@@ -58,6 +58,12 @@ module.exports.postListing = async (req, res) => {
         url: req.file.path,
         filename: req.file.filename,
       };
+    } else {
+      // Default placeholder if no image uploaded
+      listing.image = {
+        url: "/images/placeholder.png",
+        filename: "placeholder"
+      };
     }
 
     listing.owner = req.user._id;

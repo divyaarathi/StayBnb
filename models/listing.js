@@ -14,13 +14,11 @@ const listSchema = new Schema({
     required: true,
   },
 
-  // ✅ MULTIPLE IMAGES (Cloudinary)
-  images: [
-    {
-      url: String,
-      filename: String
-    }
-  ],
+  // ✅ SINGLE IMAGE (Cloudinary)
+  image: {
+    url: String,
+    filename: String
+  },
 
   price: Number,
 
