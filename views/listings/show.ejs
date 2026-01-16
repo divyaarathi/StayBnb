@@ -56,10 +56,22 @@
     <p><b>Category:</b> <%= listing.category %></p>
   </div>
 
-  <div class="action-btns" style="display: flex; gap: 0.5rem; flex-wrap: wrap">
+  <div
+    class="action-btns"
+    style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center"
+  >
     <% if ( currUser && listing.owner && currUser._id.toString() ===
     listing.owner._id.toString() ) { %>
-    <a href="/listings/<%= listing._id %>/edit" class="btn btn-warning">
+    <a
+      href="/listings/<%= listing._id %>/edit"
+      class="btn btn-warning"
+      style="
+        padding: 0.375rem 0.75rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+      "
+    >
       Edit Listing
     </a>
 
@@ -68,11 +80,27 @@
       method="POST"
       style="display: inline"
     >
-      <button type="submit" class="btn btn-danger">Delete Listing</button>
+      <button
+        type="submit"
+        class="btn btn-danger"
+        style="padding: 0.375rem 0.75rem; height: 2.5rem"
+      >
+        Delete Listing
+      </button>
     </form>
     <% } %>
 
-    <a href="/listings" class="btn btn-secondary">Back</a>
+    <a
+      href="/listings"
+      class="btn btn-secondary"
+      style="
+        padding: 0.375rem 0.75rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+      "
+      >Back</a
+    >
   </div>
 
   <hr />
@@ -87,12 +115,14 @@
       class="review-form"
       style="
         margin-bottom: 2rem;
-        padding: 1rem;
-        background: #f9f9f9;
-        border-radius: 10px;
+        padding: 1.5rem;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       "
     >
-      <h5>Leave a Review</h5>
+      <h5 style="margin-bottom: 1rem; color: #333">Leave a Review</h5>
       <form action="/listings/<%= listing._id %>/reviews" method="POST">
         <div class="mb-3">
           <label for="rating" class="form-label">Rating (1-5 stars)</label>
