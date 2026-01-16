@@ -56,7 +56,7 @@
     <p><b>Category:</b> <%= listing.category %></p>
   </div>
 
-  <div class="action-btns">
+  <div class="action-btns" style="display: flex; gap: 0.5rem; flex-wrap: wrap">
     <% if ( currUser && listing.owner && currUser._id.toString() ===
     listing.owner._id.toString() ) { %>
     <a href="/listings/<%= listing._id %>/edit" class="btn btn-warning">
@@ -73,6 +73,106 @@
     <% } %>
 
     <a href="/listings" class="btn btn-secondary">Back</a>
+  </div>
+
+  <hr />
+
+  <!-- REVIEWS SECTION -->
+  <div class="reviews-section">
+    <h3>Reviews & Ratings</h3>
+
+    <!-- Add Review Form -->
+    <% if (currUser) { %>
+    <div
+      class="review-form"
+      style="
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: #f9f9f9;
+        border-radius: 10px;
+      "
+    >
+      <h5>Leave a Review</h5>
+      <form action="/listings/<%= listing._id %>/reviews" method="POST">
+        <div class="mb-3">
+          <label for="rating" class="form-label">Rating (1-5 stars)</label>
+          <select
+            name="review[rating]"
+            id="rating"
+            class="form-select"
+            required
+          >
+            <option value="">Select rating</option>
+            <option value="1">⭐ 1 Star</option>
+            <option value="2">⭐⭐ 2 Stars</option>
+            <option value="3">⭐⭐⭐ 3 Stars</option>
+            <option value="4">⭐⭐⭐⭐ 4 Stars</option>
+            <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="comment" class="form-label">Comment</label>
+          <textarea
+            name="review[comment]"
+            id="comment"
+            class="form-control"
+            rows="4"
+            required
+          ></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Review</button>
+      </form>
+    </div>
+    <% } else { %>
+    <p><a href="/login">Login</a> to leave a review</p>
+    <% } %>
+
+    <!-- Display Reviews -->
+    <div class="reviews-list">
+      <% if (listing.reviews && listing.reviews.length > 0) { %> <%
+      listing.reviews.forEach((review) => { %>
+      <div
+        class="review-card"
+        style="
+          padding: 1rem;
+          margin-bottom: 1rem;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+        "
+      >
+        <div
+          class="review-header"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div>
+            <strong><%= review.author.username %></strong>
+            <span
+              style="color: #fe424d; font-size: 1.1rem; margin-left: 0.5rem"
+            >
+              <% for (let i = 0; i < review.rating; i++) { %>⭐<% } %>
+            </span>
+          </div>
+          <% if (currUser && review.author._id.toString() ===
+          currUser._id.toString()) { %>
+          <form
+            action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
+            method="POST"
+            style="display: inline"
+          >
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+          <% } %>
+        </div>
+        <p style="margin-top: 0.5rem; color: #333"><%= review.comment %></p>
+      </div>
+      <% }); %> <% } else { %>
+      <p style="color: #999">No reviews yet. Be the first to review!</p>
+      <% } %>
+    </div>
   </div>
 
   <hr />
