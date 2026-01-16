@@ -49,7 +49,7 @@ if (!process.env.SESSION_SECRET) {
 
 // ------------------ MongoDB Connection ------------------
 mongoose
-  .connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(dbUrl)
   .then(() => console.log("MongoDB connected successfully"))
   .catch((err) => {
     console.error("MongoDB connection error:", err);
@@ -58,7 +58,7 @@ mongoose
 
 // ------------------ SESSION CONFIG ------------------
 const store = MongoStore.create({
-  mongoUrl: dbUrl,
+  client: mongoose.connection,
   crypto: { secret: process.env.SESSION_SECRET },
   touchAfter: 24 * 60 * 60, // 1 day
 });
