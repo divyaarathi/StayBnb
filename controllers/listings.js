@@ -100,7 +100,15 @@ module.exports.editListing = async (req, res) => {
     return res.redirect("/listings");
   }
 
-  res.render("listings/edit", { listing });
+  // Determine a safe original image URL to show in the edit form
+  let originalImage = "/images/placeholder.png";
+  if (typeof listing.image === "string") {
+    originalImage = listing.image;
+  } else if (listing.image && listing.image.url) {
+    originalImage = listing.image.url;
+  }
+
+  res.render("listings/edit", { listing, originalImage, currUser: req.user });
 };
 
 // ---------------- UPDATE LISTING ----------------
@@ -166,8 +174,19 @@ module.exports.deleteListing = async (req, res) => {
 // ---------------- INDEX ----------------
 module.exports.index = async (req, res) => {
   try {
-    const allLists = await Listing.find({}).populate("owner");
-    res.render("listings/index", { allLists, currUser: req.user });
+    // Allow filtering by category via query param, e.g. /listings?category=room
+    const { category } = req.query;
+    let query = {};
+    if (category && category !== "all") {
+      query.category = category;
+    }
+
+    const allLists = await Listing.find(query).populate("owner");
+    res.render("listings/index", {
+      allLists,
+      currUser: req.user,
+      selectedCategory: category || "all",
+    });
   } catch (err) {
     console.error(err);
     req.flash("error", "Server error");
